@@ -1,3 +1,4 @@
+
 package com.example.calculator.domain;
 
 import org.junit.jupiter.api.DisplayName;
