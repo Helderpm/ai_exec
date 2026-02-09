@@ -1,11 +1,13 @@
 // src/main/java/com/example/calculator/domain/WorkingDayService.java
 package com.example.calculator.domain;
 
+import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.DayOfWeek;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
+@Service
 public class WorkingDayService {
 
     /**
