@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.constraints.*;
@@ -19,36 +18,36 @@ import java.time.LocalDate;
 @Validated
 public class WorkingDayController {
 
-private final WorkingDayService workingDayService = new WorkingDayService();
+    private final WorkingDayService workingDayService = new WorkingDayService();
 
-@GetMapping("/")
-public String index() {
-    return "index";
-}
+    @GetMapping("/")
+    public String index() {
+        return "index";
+    }
 
-@GetMapping("/calculate")
-public String calculate(
-        @RequestParam("start") @NotNull(message = "Start date is required") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-        @RequestParam("end") @NotNull(message = "End date is required") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
-        Model model,
-        RedirectAttributes redirectAttributes) {
-    
-    // Validate business logic
-    if (start.isAfter(end)) {
-        redirectAttributes.addFlashAttribute("error", "Start date cannot be after end date");
-        return "redirect:/";
+    @GetMapping("/calculate")
+    public String calculate(
+            @RequestParam("start") @NotNull(message = "Start date is required") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam("end") @NotNull(message = "End date is required") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        
+        // Validate business logic
+        if (start.isAfter(end)) {
+            redirectAttributes.addFlashAttribute("error", "Start date cannot be after end date");
+            return "redirect:/";
+        }
+        
+        // Validate date range (prevent unreasonable ranges)
+        if (start.isBefore(LocalDate.of(1900, 1, 1)) || end.isAfter(LocalDate.of(2100, 12, 31))) {
+            redirectAttributes.addFlashAttribute("error", "Date range must be between 1900-01-01 and 2100-12-31");
+            return "redirect:/";
+        }
+        
+        long result = workingDayService.calculateWorkingDays(start, end);
+        model.addAttribute("result", result);
+        model.addAttribute("start", start);
+        model.addAttribute("end", end);
+        return "index";
     }
-    
-    // Validate date range (prevent unreasonable ranges)
-    if (start.isBefore(LocalDate.of(1900, 1, 1)) || end.isAfter(LocalDate.of(2100, 12, 31))) {
-        redirectAttributes.addFlashAttribute("error", "Date range must be between 1900-01-01 and 2100-12-31");
-        return "redirect:/";
-    }
-    
-    long result = workingDayService.calculateWorkingDays(start, end);
-    model.addAttribute("result", result);
-    model.addAttribute("start", start);
-    model.addAttribute("end", end);
-    return "index";
-}
 }
