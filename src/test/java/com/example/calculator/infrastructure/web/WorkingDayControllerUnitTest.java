@@ -1,6 +1,7 @@
 package com.example.calculator.infrastructure.web;
 
-import com.example.calculator.domain.WorkingDayService;
+import com.example.calculator.application.service.WorkingDayApplicationService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import java.time.LocalDate;
 import org.springframework.ui.ExtendedModelMap;
+
+import com.example.calculator.domain.usecase.WorkingDayService;
+import com.example.calculator.infrastructure.adapter.CountryService;
+import com.example.calculator.domain.usecase.WorkingDayRequestValidator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +26,14 @@ class WorkingDayControllerUnitTest {
 
     @BeforeEach
     void setUp() {
-        controller = new WorkingDayController(new WorkingDayService());
+        CountryService countryService = new CountryService(new ObjectMapper());
+        countryService.loadCountries();
+        WorkingDayRequestValidator validator = new WorkingDayRequestValidator(countryService);
+        WorkingDayService workingDayService = new WorkingDayService();
+        WorkingDayApplicationService applicationService = new WorkingDayApplicationService(
+            workingDayService, validator, countryService
+        );
+        controller = new WorkingDayController(applicationService);
         redirectAttributes = new RedirectAttributesModelMap();
         model = new ExtendedModelMap();
     }
@@ -32,7 +44,7 @@ class WorkingDayControllerUnitTest {
         LocalDate start = LocalDate.of(2023, 10, 10);
         LocalDate end = LocalDate.of(2023, 10, 5);
 
-        String result = controller.calculate(start, end, model, redirectAttributes);
+        String result = controller.calculate(start, end, "DE", model, redirectAttributes);
 
         assertEquals("redirect:/", result);
         assertTrue(redirectAttributes.getFlashAttributes().containsKey("error"));
@@ -45,7 +57,7 @@ class WorkingDayControllerUnitTest {
         LocalDate start = LocalDate.of(1899, 12, 31);
         LocalDate end = LocalDate.of(2023, 10, 5);
 
-        String result = controller.calculate(start, end, model, redirectAttributes);
+        String result = controller.calculate(start, end, "DE", model, redirectAttributes);
 
         assertEquals("redirect:/", result);
         assertTrue(redirectAttributes.getFlashAttributes().containsKey("error"));
@@ -58,7 +70,7 @@ class WorkingDayControllerUnitTest {
         LocalDate start = LocalDate.of(2023, 10, 5);
         LocalDate end = LocalDate.of(2101, 1, 1);
 
-        String result = controller.calculate(start, end, model, redirectAttributes);
+        String result = controller.calculate(start, end, "DE", model, redirectAttributes);
 
         assertEquals("redirect:/", result);
         assertTrue(redirectAttributes.getFlashAttributes().containsKey("error"));
@@ -71,7 +83,7 @@ class WorkingDayControllerUnitTest {
         LocalDate start = LocalDate.of(2023, 10, 2); // Monday
         LocalDate end = LocalDate.of(2023, 10, 6);   // Friday
 
-        String result = controller.calculate(start, end, model, redirectAttributes);
+        String result = controller.calculate(start, end, "DE", model, redirectAttributes);
 
         assertEquals("index", result);
         assertFalse(redirectAttributes.getFlashAttributes().containsKey("error"));
@@ -83,7 +95,7 @@ class WorkingDayControllerUnitTest {
         LocalDate start = LocalDate.of(1900, 1, 1);
         LocalDate end = LocalDate.of(1900, 1, 2);
 
-        String result = controller.calculate(start, end, model, redirectAttributes);
+        String result = controller.calculate(start, end, "DE", model, redirectAttributes);
 
         assertEquals("index", result);
         assertFalse(redirectAttributes.getFlashAttributes().containsKey("error"));
@@ -95,7 +107,7 @@ class WorkingDayControllerUnitTest {
         LocalDate start = LocalDate.of(2100, 12, 30);
         LocalDate end = LocalDate.of(2100, 12, 31);
 
-        String result = controller.calculate(start, end, model, redirectAttributes);
+        String result = controller.calculate(start, end, "DE", model, redirectAttributes);
 
         assertEquals("index", result);
         assertFalse(redirectAttributes.getFlashAttributes().containsKey("error"));
@@ -106,7 +118,7 @@ class WorkingDayControllerUnitTest {
     void shouldHandleSameDayValidDate() {
         LocalDate date = LocalDate.of(2023, 10, 4); // Wednesday
 
-        String result = controller.calculate(date, date, model, redirectAttributes);
+        String result = controller.calculate(date, date, "DE", model, redirectAttributes);
 
         assertEquals("index", result);
         assertFalse(redirectAttributes.getFlashAttributes().containsKey("error"));
@@ -115,7 +127,7 @@ class WorkingDayControllerUnitTest {
     @Test
     @DisplayName("Should return index page for root path")
     void shouldReturnIndexForRootPath() {
-        String result = controller.index();
+        String result = controller.index(model);
         assertEquals("index", result);
     }
 }

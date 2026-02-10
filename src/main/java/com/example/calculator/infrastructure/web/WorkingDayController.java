@@ -1,7 +1,11 @@
-// src/main/java/com/example/calculator/infrastructure/web/WorkingDayController.java
 package com.example.calculator.infrastructure.web;
 
-import com.example.calculator.domain.WorkingDayService;
+import com.example.calculator.application.service.WorkingDayApplicationService;
+import com.example.calculator.domain.model.WorkingDayResult;
+import com.example.calculator.domain.model.WorkingDayError;
+import com.example.calculator.domain.model.ValidationResult;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,25 +13,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
+@Slf4j
 @Controller
 @Validated
+@RequiredArgsConstructor
 public class WorkingDayController {
 
-    private final WorkingDayService workingDayService;
-
-    @Autowired
-    public WorkingDayController(WorkingDayService workingDayService) {
-        this.workingDayService = workingDayService;
-    }
+    private final WorkingDayApplicationService applicationService;
 
     @GetMapping("/")
-    public String index() {
+    public String index(Model model) {
+        model.addAttribute("countries", applicationService.getAllCountries());
         return "index";
     }
 
@@ -35,35 +36,40 @@ public class WorkingDayController {
     public String calculate(
             @RequestParam("start") @NotNull(message = "Start date is required") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam("end") @NotNull(message = "End date is required") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+            @RequestParam("country") String countryCode,
             Model model,
             RedirectAttributes redirectAttributes) {
         
-        String validationError = validateDateRange(start, end);
-        if (validationError != null) {
-            redirectAttributes.addFlashAttribute("error", validationError);
-            return "redirect:/";
+        log.info("Calculate request - start: {}, end: {}, country: {}", start, end, countryCode);
+        
+        ValidationResult validation = applicationService.validateRequest(start, end, countryCode);
+        
+        if (!validation.valid()) {
+            log.error("Validation failed - errorCode: {}, message: {}", validation.error().getCode(), validation.error().getMessage());
+            return getRedirectString(redirectAttributes, validation);
         }
         
-        long result = workingDayService.calculateWorkingDays(start, end);
-        addResultToModel(model, result, start, end);
+        WorkingDayResult result = applicationService.calculateWorkingDays(start, end, countryCode, validation.country());
+        log.info("Calculation successful - workingDays: {}, start: {}, end: {}, country: {}", 
+                result.workingDays(), result.startDate(), result.endDate(), result.country().getCode());
+        
+        addResultToModel(model, result);
         return "index";
     }
-    
-    private String validateDateRange(LocalDate start, LocalDate end) {
-        if (start.isAfter(end)) {
-            return "Start date cannot be after end date";
-        }
-        
-        if (start.isBefore(LocalDate.of(1900, 1, 1)) || end.isAfter(LocalDate.of(2100, 12, 31))) {
-            return "Date range must be between 1900-01-01 and 2100-12-31";
-        }
-        
-        return null;
+
+    private static String getRedirectString(RedirectAttributes redirectAttributes, ValidationResult validation) {
+        WorkingDayError error = validation.error();
+        redirectAttributes.addFlashAttribute("error", error.getMessage());
+        redirectAttributes.addFlashAttribute("errorCode", error.getCode());
+        return "redirect:/";
     }
-    
-    private void addResultToModel(Model model, long result, LocalDate start, LocalDate end) {
-        model.addAttribute("result", result);
-        model.addAttribute("start", start);
-        model.addAttribute("end", end);
-    }
+
+    private void addResultToModel(Model model, WorkingDayResult result) {
+                model.addAttribute("result", result.workingDays());
+                model.addAttribute("start", result.startDate());
+                model.addAttribute("end", result.endDate());
+                model.addAttribute("country", result.country().getName());
+                model.addAttribute("countries", result.allCountries());
+                model.addAttribute("selectedCountry", result.selectedCountryCode());
+        }
 }
