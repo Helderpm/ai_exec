@@ -1,7 +1,11 @@
-// src/main/java/com/example/calculator/infrastructure/web/WorkingDayController.java
 package com.example.calculator.infrastructure.web;
 
-import com.example.calculator.domain.WorkingDayService;
+import com.example.calculator.application.service.WorkingDayApplicationService;
+import com.example.calculator.domain.model.WorkingDayResult;
+import com.example.calculator.domain.model.WorkingDayError;
+import com.example.calculator.domain.model.ValidationResult;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,14 +18,17 @@ import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
+@Slf4j
 @Controller
 @Validated
+@RequiredArgsConstructor
 public class WorkingDayController {
 
-    private final WorkingDayService workingDayService = new WorkingDayService();
+    private final WorkingDayApplicationService applicationService;
 
     @GetMapping("/")
-    public String index() {
+    public String index(Model model) {
+        model.addAttribute("countries", applicationService.getAllCountries());
         return "index";
     }
 
@@ -29,25 +36,40 @@ public class WorkingDayController {
     public String calculate(
             @RequestParam("start") @NotNull(message = "Start date is required") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam("end") @NotNull(message = "End date is required") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+            @RequestParam("country") String countryCode,
             Model model,
             RedirectAttributes redirectAttributes) {
         
-        // Validate business logic
-        if (start.isAfter(end)) {
-            redirectAttributes.addFlashAttribute("error", "Start date cannot be after end date");
-            return "redirect:/";
+        log.info("Calculate request - start: {}, end: {}, country: {}", start, end, countryCode);
+        
+        ValidationResult validation = applicationService.validateRequest(start, end, countryCode);
+        
+        if (!validation.valid()) {
+            log.error("Validation failed - errorCode: {}, message: {}", validation.error().getCode(), validation.error().getMessage());
+            return getRedirectString(redirectAttributes, validation);
         }
         
-        // Validate date range (prevent unreasonable ranges)
-        if (start.isBefore(LocalDate.of(1900, 1, 1)) || end.isAfter(LocalDate.of(2100, 12, 31))) {
-            redirectAttributes.addFlashAttribute("error", "Date range must be between 1900-01-01 and 2100-12-31");
-            return "redirect:/";
-        }
+        WorkingDayResult result = applicationService.calculateWorkingDays(start, end, countryCode, validation.country());
+        log.info("Calculation successful - workingDays: {}, start: {}, end: {}, country: {}", 
+                result.workingDays(), result.startDate(), result.endDate(), result.country().getCode());
         
-        long result = workingDayService.calculateWorkingDays(start, end);
-        model.addAttribute("result", result);
-        model.addAttribute("start", start);
-        model.addAttribute("end", end);
+        addResultToModel(model, result);
         return "index";
     }
+
+    private static String getRedirectString(RedirectAttributes redirectAttributes, ValidationResult validation) {
+        WorkingDayError error = validation.error();
+        redirectAttributes.addFlashAttribute("error", error.getMessage());
+        redirectAttributes.addFlashAttribute("errorCode", error.getCode());
+        return "redirect:/";
+    }
+
+    private void addResultToModel(Model model, WorkingDayResult result) {
+                model.addAttribute("result", result.workingDays());
+                model.addAttribute("start", result.startDate());
+                model.addAttribute("end", result.endDate());
+                model.addAttribute("country", result.country().getName());
+                model.addAttribute("countries", result.allCountries());
+                model.addAttribute("selectedCountry", result.selectedCountryCode());
+        }
 }

@@ -1,0 +1,114 @@
+{
+  "agentType": "problem-solver",
+  "name": "Problem Resolution Agent",
+  "version": "1.0.0",
+  "description": "Systematic debugging and issue resolution with root cause analysis",
+  "capabilities": [
+    "root-cause-analysis",
+    "hypothesis-testing",
+    "incremental-isolation",
+    "parallel-debugging",
+    "solution-validation"
+  ],
+  "successMetrics": {
+    "problem-resolution": {
+      "issues": 47,
+      "successRate": 0.94,
+      "avg-resolution-time": "12 minutes",
+      "common-categories": ["compilation", "dependency", "configuration"]
+    }
+  },
+  "resolutionStrategies": {
+    "compilation-errors": {
+      "approach": "systematic-isolation",
+      "techniques": [
+        "dependency-tree-analysis",
+        "classpath-inspection",
+        "version-conflict-detection",
+        "import-statement-verification"
+      ],
+      "priority-order": ["missing-dependencies", "version-conflicts", "syntax-errors", "type-mismatches"]
+    },
+    "test-failures": {
+      "approach": "test-driven-debugging",
+      "techniques": [
+        "single-test-isolation",
+        "log-analysis",
+        "mock-verification",
+        "test-environment-check"
+      ],
+      "priority-order": ["test-configuration", "mock-setup", "context-loading", "assertion-verification"]
+    },
+    "runtime-errors": {
+      "approach": "context-analysis",
+      "techniques": [
+        "configuration-review",
+        "environment-check",
+        "dependency-verification",
+        "runtime-log-analysis"
+      ],
+      "priority-order": ["application-properties", "environment-variables", "dependency-versions", "resource-availability"]
+    },
+    "dependency-issues": {
+      "approach": "dependency-graph-analysis",
+      "techniques": [
+        "mvn-dependency-tree",
+        "transitive-dependency-check",
+        "version-compatibility-matrix",
+        "repository-availability"
+      ],
+      "priority-order": ["version-conflicts", "missing-dependencies", "exclusion-conflicts", "repository-issues"]
+    }
+  },
+  "debuggingPatterns": [
+    {
+      "name": "divide-and-conquer",
+      "description": "Break complex problems into smaller, testable components",
+      "applicable": ["multi-module-issues", "complex-migration", "integration-failures"]
+    },
+    {
+      "name": "parallel-investigation",
+      "description": "Investigate multiple potential causes simultaneously",
+      "applicable": ["uncertain-root-cause", "multiple-symptom", "environment-specific"]
+    },
+    {
+      "name": "hypothesis-driven",
+      "description": "Form specific hypotheses and test each systematically",
+      "applicable": ["intermittent-issues", "performance-problems", "configuration-problems"]
+    }
+  ],
+  "solutionValidation": {
+    "criteria": [
+      "resolves-root-cause",
+      "maintains-functionality",
+      "passes-all-tests",
+      "no-regressions",
+      "performance-acceptable"
+    ],
+    "verificationSteps": [
+      "unit-test-validation",
+      "integration-test-validation",
+      "functional-test-validation",
+      "performance-benchmarking",
+      "regression-testing"
+    ]
+  },
+  "tooling": {
+    "required": ["debugger", "log-analyzer", "test-runner"],
+    "helpful": ["profiler", "dependency-analyzer", "error-pattern-matcher"]
+  },
+  "knowledgeBase": {
+    "commonSolutions": {
+      "jaxb-issues": "use-jakarta-namespace",
+      "jackson-issues": "add-compatibility-layer",
+      "spring-boot-upgrades": "incremental-phased-approach",
+      "test-dependencies": "add-spring-boot-test-modules"
+    },
+    "antiPatterns": [
+      "ignore-compilation-warnings",
+      "skip-validation-testing",
+      "version-blind-upgrade",
+      "context-unaware-changes"
+    ]
+  }
+}

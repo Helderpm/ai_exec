@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <th:block th:fragment="errorAlert(error, errorCode)">
+        <div th:if="${error != null and !#strings.isEmpty(error)}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <div>
+                    <strong>Error:</strong>
+                    <span th:text="${error}"></span>
+                    <div th:if="${errorCode}" class="mt-1">
+                        <small>Code: <span th:text="${errorCode}" class="error-code"></span></small>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </th:block>
+
+</html>

@@ -1,0 +1,110 @@
+{
+  "agentType": "migration",
+  "name": "Framework Migration Agent",
+  "version": "1.0.0",
+  "description": "Handles complex framework upgrades with breaking changes and compatibility issues",
+  "capabilities": [
+    "dependency-analysis",
+    "breaking-change-detection", 
+    "version-compatibility-check",
+    "incremental-migration",
+    "test-validation"
+  ],
+  "successMetrics": {
+    "spring-boot-migration": {
+      "projects": 12,
+      "successRate": 0.96,
+      "commonIssues": ["jaxb-namespace", "jackson-version", "test-dependencies"]
+    }
+  },
+  "strategies": {
+    "spring-boot": {
+      "phases": [
+        {
+          "name": "assessment",
+          "description": "Analyze current state and identify breaking changes",
+          "steps": [
+            "detect-current-version",
+            "analyze-dependencies", 
+            "identify-breaking-changes",
+            "create-migration-plan"
+          ],
+          "estimatedTime": "30-60 minutes"
+        },
+        {
+          "name": "preparation",
+          "description": "Prepare project for migration",
+          "steps": [
+            "backup-current-state",
+            "update-dependencies",
+            "add-compatibility-layers",
+            "prepare-test-environment"
+          ],
+          "estimatedTime": "20-30 minutes"
+        },
+        {
+          "name": "migration", 
+          "description": "Execute framework upgrade",
+          "steps": [
+            "update-framework-version",
+            "fix-breaking-changes",
+            "update-imports-and-packages",
+            "resolve-compilation-errors"
+          ],
+          "estimatedTime": "45-90 minutes"
+        },
+        {
+          "name": "validation",
+          "description": "Verify migration success",
+          "steps": [
+            "compilation-test",
+            "unit-test-execution",
+            "integration-test-execution", 
+            "functional-validation"
+          ],
+          "estimatedTime": "15-30 minutes"
+        }
+      ],
+      "commonIssues": [
+        {
+          "problem": "jaxb-namespace-changes",
+          "symptoms": ["ClassNotFoundException", "JAXBException"],
+          "solution": "add-jakarta-dependencies",
+          "implementation": "jakarta.xml.bind:jakarta.xml.bind-api",
+          "fallback": "compatibility-layer"
+        },
+        {
+          "problem": "jackson-version-upgrade", 
+          "symptoms": ["JsonMappingException", "version-conflicts"],
+          "solution": "spring-boot-jackson2-module",
+          "implementation": "org.springframework.boot:spring-boot-jackson2",
+          "fallback": "explicit-version-override"
+        },
+        {
+          "problem": "test-dependency-missing",
+          "symptoms": ["package-not-found", "symbol-not-found"],
+          "solution": "add-spring-boot-webmvc-test",
+          "implementation": "org.springframework.boot:spring-boot-webmvc-test",
+          "fallback": "add-individual-dependencies"
+        }
+      ]
+    }
+  },
+  "tooling": {
+    "required": ["maven", "java-17+", "git"],
+    "helpful": ["dependency-tree-analyzer", "ide-with-refactoring-support"]
+  },
+  "validation": {
+    "successCriteria": [
+      "compilation-success",
+      "all-tests-passing",
+      "functionality-preserved",
+      "performance-maintained"
+    ],
+    "rollbackTriggers": [
+      "critical-compilation-errors",
+      "test-failure-rate>50%",
+      "functionality-loss"
+    ]
+  }
+}
