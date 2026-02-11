@@ -1,8 +1,8 @@
 package com.example.calculator.domain.usecase;
 
 import com.example.calculator.domain.port.WorkingDayCalculator;
-import de.jollyday.HolidayManager;
-import de.jollyday.ManagerParameters;
+import de.focus_shift.jollyday.core.HolidayManager;
+import de.focus_shift.jollyday.core.ManagerParameters;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.DayOfWeek;
@@ -28,14 +28,17 @@ public class WorkingDayService implements WorkingDayCalculator {
     public long calculateWorkingDays(LocalDate start, LocalDate end, String countryCode) {
         if (start.isAfter(end)) return 0;
         
+        // Map country code to HolidayCalendar
+        String calendarCode = countryCode.toUpperCase();
+        
         HolidayManager holidayManager = HolidayManager.getInstance(
-                ManagerParameters.create(countryCode.toUpperCase())
+                ManagerParameters.create(calendarCode)
         );
         
         return Stream.iterate(start, date -> date.plusDays(1))
                 .limit(java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1)
                 .filter(date -> !isWeekend(date))
-                .filter(date -> !holidayManager.isHoliday(date))
+                .filter(date -> !holidayManager.isHoliday(date, calendarCode))
                 .count();
     }
     

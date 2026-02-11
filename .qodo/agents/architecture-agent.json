@@ -1,0 +1,80 @@
+{
+  "agentType": "architecture",
+  "name": "Architecture Analysis Agent",
+  "version": "1.0.0",
+  "description": "Analyzes and documents software architecture with clean architecture principles",
+  "capabilities": [
+    "layer-identification",
+    "component-mapping", 
+    "relationship-analysis",
+    "diagram-generation",
+    "pattern-recognition",
+    "simplification-strategies"
+  ],
+  "successMetrics": {
+    "architecture-analysis": {
+      "projects": 8,
+      "successRate": 0.98,
+      "diagrams-generated": 45,
+      "patterns-identified": 12
+    }
+  },
+  "analysisTypes": {
+    "clean-architecture": {
+      "layers": ["domain", "application", "infrastructure"],
+      "principles": ["solid", "hexagonal-ports", "dependency-inversion"],
+      "outputs": ["uml-diagram", "component-diagram", "package-structure", "sequence-diagram"]
+    },
+    "simplification": {
+      "removeRedundancy": true,
+      "focusOnEssentials": true,
+      "maintainDataFlow": true,
+      "maxComponents": 8
+    }
+  },
+  "diagramTemplates": {
+    "architecture-overview": {
+      "type": "mermaid",
+      "style": "simplified-layers",
+      "components": ["user", "infrastructure", "application", "domain", "external-systems"],
+      "exclude": ["detailed-subcomponents", "redundant-styling"]
+    },
+    "uml-class": {
+      "type": "mermaid",
+      "detail": "full",
+      "show-relationships": true,
+      "show-methods": true
+    },
+    "sequence-flow": {
+      "type": "mermaid", 
+      "show-external-systems": true,
+      "show-error-flows": true
+    }
+  },
+  "recognitionPatterns": [
+    {
+      "name": "hexagonal-architecture",
+      "indicators": ["port-interfaces", "adapter-implementations", "domain-core"],
+      "description": "Ports and adapters pattern with clear domain boundaries"
+    },
+    {
+      "name": "clean-layering",
+      "indicators": ["unidirectional-dependencies", "layer-separation", "dependency-inversion"],
+      "description": "Clear separation between domain, application, and infrastructure layers"
+    },
+    {
+      "name": "solid-principles",
+      "indicators": ["single-responsibility", "open-closed", "liskov-substitution", "interface-segregation", "dependency-inversion"],
+      "description": "SOLID design principles properly applied"
+    }
+  ],
+  "tooling": {
+    "required": ["code-analysis-tools", "diagram-generators", "documentation-formats"],
+    "helpful": ["plantuml", "mermaid-live-editor", "architecture-diagram-tools"]
+  },
+  "outputFormats": {
+    "documentation": ["markdown", "html", "pdf"],
+    "diagrams": ["mermaid", "plantuml", "svg"],
+    "configuration": ["json", "yaml"]
+  }
+}

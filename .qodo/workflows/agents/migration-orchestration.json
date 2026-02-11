@@ -1,0 +1,221 @@
+{
+  "workflowName": "Spring Boot Migration Orchestration",
+  "version": "1.0.0",
+  "description": "Coordinates multiple AI agents for framework migration with proven success patterns",
+  "metadata": {
+    "created": "2026-02-11T11:41:00Z",
+    "projectType": "spring-boot-migration",
+    "complexity": "high",
+    "estimatedDuration": "2-4 hours",
+    "successRate": 0.96
+  },
+  "agents": [
+    {
+      "name": "migration-agent",
+      "phase": "assessment",
+      "priority": 1,
+      "responsibilities": [
+        "detect-current-version",
+        "analyze-dependencies", 
+        "identify-breaking-changes",
+        "create-migration-plan",
+        "estimate-complexity"
+      ],
+      "output": "migration-plan.json",
+      "successCriteria": [
+        "all-dependencies-analyzed",
+        "breaking-changes-identified",
+        "migration-plan-complete"
+      ],
+      "configFile": ".qodo/agents/migration-agent.json"
+    },
+    {
+      "name": "architecture-agent",
+      "phase": "documentation",
+      "priority": 2,
+      "responsibilities": [
+        "update-uml-diagrams",
+        "simplify-component-diagrams",
+        "document-architecture-changes",
+        "validate-clean-architecture"
+      ],
+      "output": "updated-architecture-docs/",
+      "successCriteria": [
+        "diagrams-consistent",
+        "documentation-complete",
+        "architecture-principles-maintained"
+      ],
+      "configFile": ".qodo/agents/architecture-agent.json"
+    },
+    {
+      "name": "problem-solver",
+      "phase": "resolution",
+      "priority": 3,
+      "responsibilities": [
+        "fix-compilation-errors",
+        "resolve-test-failures",
+        "address-runtime-issues",
+        "validate-solution-effectiveness"
+      ],
+      "output": "resolved-issues.json",
+      "successCriteria": [
+        "all-tests-passing",
+        "functionality-preserved",
+        "no-regressions-introduced"
+      ],
+      "configFile": ".qodo/agents/problem-solver.json"
+    }
+  ],
+  "coordination": {
+    "handoffPoints": [
+      {
+        "from": "migration-agent",
+        "to": "architecture-agent",
+        "trigger": "migration-plan-complete",
+        "data": [
+          "dependency-changes",
+          "new-version-info", 
+          "breaking-change-list",
+          "complexity-estimate"
+        ],
+        "validation": [
+          "architecture-agent-received-data",
+          "documentation-updated-successfully"
+        ]
+      },
+      {
+        "from": "migration-agent",
+        "to": "problem-solver",
+        "trigger": "compilation-errors-detected",
+        "data": [
+          "error-logs",
+          "dependency-conflicts",
+          "compilation-failures",
+          "context-stack-trace"
+        ],
+        "validation": [
+          "problem-solver-received-context",
+          "resolution-initiated"
+        ]
+      },
+      {
+        "from": "problem-solver",
+        "to": "migration-agent",
+        "trigger": "resolution-complete",
+        "data": [
+          "resolution-summary",
+          "applied-fixes",
+          "validation-results"
+        ],
+        "validation": [
+          "migration-context-updated",
+          "workflow-can-proceed"
+        ]
+      }
+    ],
+    "contextSharing": {
+      "mechanism": "shared-workspace",
+      "dataTypes": [
+        {
+          "name": "project-config",
+          "scope": "global",
+          "content": ["framework-version", "java-version", "build-tool", "dependency-tree"]
+        },
+        {
+          "name": "migration-status", 
+          "scope": "workflow",
+          "content": ["current-phase", "completed-steps", "issues-found", "success-metrics"]
+        },
+        {
+          "name": "error-context",
+          "scope": "temporary",
+          "content": ["current-error", "stack-trace", "recent-changes", "environment-state"]
+        }
+      ],
+      "updateFrequency": "real-time",
+      "persistence": "workflow-session"
+    }
+  },
+  "executionStrategy": {
+    "approach": "phased-parallel",
+    "parallelism": {
+      "enabled": true,
+      "maxConcurrentAgents": 3,
+      "resourceSharing": "context-workspace"
+    },
+    "errorHandling": {
+      "strategy": "continue-on-non-critical",
+      "retryPolicy": {
+        "maxRetries": 3,
+        "backoffStrategy": "exponential",
+        "retryableErrors": ["network-timeout", "temporary-failure", "resource-conflict"]
+      },
+      "escalation": {
+        "humanApprovalRequired": ["data-loss", "security-issues", "architecture-changes"],
+        "automaticRollback": ["compilation-failure", "test-failure-rate-50%"]
+      }
+    },
+    "monitoring": {
+      "metrics": [
+        "agent-execution-time",
+        "phase-completion-rate", 
+        "error-resolution-time",
+        "overall-workflow-duration"
+      ],
+      "logging": {
+        "level": "detailed",
+        "includeContext": true,
+        "structuredOutput": "json"
+      }
+    }
+  },
+  "integration": {
+    "cliCommands": [
+      {
+        "command": "workflow-runner --execute migration-orchestration",
+        "description": "Execute complete Spring Boot migration workflow",
+        "parameters": [
+          "--project-path",
+          "--target-version", 
+          "--backup-location",
+          "--learning-enabled"
+        ]
+      }
+    ],
+    "apiEndpoints": [
+      {
+        "endpoint": "/api/workflows/execute",
+        "method": "POST",
+        "description": "Execute workflow via REST API",
+        "payload": {
+          "workflowName": "string",
+          "context": "object",
+          "options": "object"
+        }
+      }
+    ],
+    "ciCdIntegration": [
+      {
+        "system": "jenkins",
+        "config": "Jenkinsfile-migration-workflow"
+      },
+      {
+        "system": "github-actions",
+        "config": ".github/workflows/migration.yml"
+      }
+    ]
+  },
+  "templates": {
+    "basedOn": "spring-boot-migration-4.0.2",
+    "adaptations": [
+      {
+        "projectType": "microservice",
+        "modifications": ["add-service-discovery", "update-health-checks"]
+      },
+      {
+        "projectType": "monolith",
+        "modifications": ["add-legacy-compatibility", "update-data-migration"]
+      }
+    ]
+  }
+}
